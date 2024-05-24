@@ -150,6 +150,11 @@ EOF  all  create  destroy  help  quit  show  update
 (hbnb) quit
 ```
 
+# AirBnB clone - RESTful API
+``Python`` ``Back-end`` ``API`` ``Webserver`` ``Flask``
+
+REST API is Resource-based, a resource is an object and can be access by a URI. An object is “displayed”/transferred via a representation (typically JSON). HTTP methods will be actions on a resource. Expose all your objects stored via a JSON web interface. Manipulate your objects via a RESTful API.
+
 ## Bugs
 No known bugs at this time. 
 
