@@ -17,23 +17,25 @@ def get_all_amenities():
     return jsonify({})
 
 
-@app_views.route('/amenities/<amenity_id>', methods=['GET'], strict_slashes=False)
+@app_views.route('/amenities/<amenity_id>',
+                 methods=['GET'], strict_slashes=False)
 def get_an_amenity(amenity_id):
     """ Get an amenity
     """
 
-    if storage.get(Amenity, amenity_id) == None:
+    if storage.get(Amenity, amenity_id) is None:
         return make_response(jsonify({"error": "Not found"}), 404)
 
     return jsonify({})
 
 
-@app_views.route('/amenities/<amenity_id>', methods=['DELETE'], strict_slashes=False)
+@app_views.route('/amenities/<amenity_id>',
+                 methods=['DELETE'], strict_slashes=False)
 def delete_an_amenity(amenity_id):
     """ Delte an amenity
     """
 
-    if storage.get(Amenity, amenity_id) == None:
+    if storage.get(Amenity, amenity_id) is None:
         return make_response(jsonify({"error": "Not found"}), 404)
 
     storage.delete(storage.get(Amenity, amenity_id))
@@ -50,12 +52,13 @@ def create_an_amenity():
     return make_response(jsonify({}), 201)
 
 
-@app_views.route('/amenities/<amenity_id>', methods=['PUT'], strict_slashes=False)
+@app_views.route('/amenities/<amenity_id>',
+                 methods=['PUT'], strict_slashes=False)
 def modify_an_amenity(amenity_id):
     """ Modify an amenity
     """
 
-    if storage.get(Amenity, amenity_id) == None:
+    if storage.get(Amenity, amenity_id) is None:
         return make_response(jsonify({"error": "Not found"}), 404)
 
     Amenity.save()

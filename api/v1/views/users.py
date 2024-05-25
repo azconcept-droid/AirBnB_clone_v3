@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" States view
+""" Users view
 """
 from flask import jsonify, make_response, request
 from models.state import State
@@ -23,7 +23,7 @@ def get_a_user(user_id):
     """ Get a single user
     """
 
-    if storage.get(User, user_id) == None:
+    if storage.get(User, user_id) is None:
         return make_response(jsonify({"error": "Not found"}), 404)
     user_obj = storage.get(User, user_id)
 
@@ -35,7 +35,7 @@ def delete_a_user(user_id):
     """ Delte a state
     """
 
-    if storage.get(User, user_id) == None:
+    if storage.get(User, user_id) is None:
         return make_response(jsonify({"error": "Not found"}), 404)
 
     storage.delete(storage.get(User, user_id))
@@ -57,7 +57,7 @@ def update_a_user(user_id):
     """ Update a user
     """
 
-    if storage.get(User, user_id) == None:
+    if storage.get(User, user_id) is None:
         return make_response(jsonify({"error": "Not found"}), 404)
 
     User.save()

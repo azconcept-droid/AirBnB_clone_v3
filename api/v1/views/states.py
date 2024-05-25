@@ -16,23 +16,26 @@ def get_all_states():
 
     return jsonify({})
 
+
 @app_views.route('/states/<state_id>', methods=['GET'], strict_slashes=False)
 def get_a_state(state_id):
     """ Get a single state
     """
 
-    if storage.get(State, state_id) == None:
+    if storage.get(State, state_id) is None:
         return make_response(jsonify({"error": "Not found"}), 404)
     print(storage.get(State, state_id))
 
     return jsonify({})
 
-@app_views.route('/states/<state_id>', methods=['DELETE'], strict_slashes=False)
+
+@app_views.route('/states/<state_id>',
+                 methods=['DELETE'], strict_slashes=False)
 def delete_a_state(state_id):
     """ Delte a state
     """
 
-    if storage.get(State, state_id) == None:
+    if storage.get(State, state_id) is None:
         return make_response(jsonify({"error": "Not found"}), 404)
 
     storage.delete(storage.get(State, state_id))
@@ -54,7 +57,7 @@ def modify_a_state(state_id):
     """ Modify a state
     """
 
-    if storage.get(State, state_id) == None:
+    if storage.get(State, state_id) is None:
         return make_response(jsonify({"error": "Not found"}), 404)
 
     State.save()
