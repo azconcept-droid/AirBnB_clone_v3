@@ -46,7 +46,7 @@ def create_a_state():
     """
 
     State.save()
-    return make_response(jsonify({}), 200)
+    return make_response(jsonify({}), 201)
 
 
 @app_views.route('/states/<state_id>', methods=['PUT'], strict_slashes=False)
