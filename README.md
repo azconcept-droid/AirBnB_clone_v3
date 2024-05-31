@@ -1,3 +1,21 @@
+# AirBnB clone - RESTful API
+``Python`` ``Back-end`` ``API`` ``Webserver`` ``Flask``
+
+REST API is Resource-based, a resource is an object and can be access by a URI. An object is “displayed”/transferred via a representation (typically JSON). HTTP methods will be actions on a resource. Expose all your objects stored via a JSON web interface. Manipulate your objects via a RESTful API.
+
+#### Functionalities of this API:
+* coming soon
+
+## Table of Content
+* [Environment](#environment-api)
+* [Installation](#installation-api)
+* [File Descriptions](#file-descriptions-api)
+* [Usage](#usage-api)
+* [Examples of use](#examples-of-use-api)
+* [Bugs](#bugs-api)
+* [Authors](#authors)
+* [License](#license)
+
 # AirBnB Clone - The Console
 The console is the first segment of the AirBnB project at Holberton School that will collectively cover fundamental concepts of higher level programming. The goal of AirBnB project is to eventually deploy our server a simple copy of the AirBnB Website(HBnB). A command interpreter is created in this segment to manage objects for the AirBnB(HBnB) website.
 
@@ -149,11 +167,6 @@ EOF  all  create  destroy  help  quit  show  update
 ** no instance found **
 (hbnb) quit
 ```
-
-# AirBnB clone - RESTful API
-``Python`` ``Back-end`` ``API`` ``Webserver`` ``Flask``
-
-REST API is Resource-based, a resource is an object and can be access by a URI. An object is “displayed”/transferred via a representation (typically JSON). HTTP methods will be actions on a resource. Expose all your objects stored via a JSON web interface. Manipulate your objects via a RESTful API.
 
 ## Bugs
 No known bugs at this time. 
