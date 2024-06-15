@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ States view
 """
-from flask import jsonify, make_response, request
+from flask import jsonify, make_response, request, abort
 from models.state import State
 from models import storage
 from api.v1.views import app_views
@@ -12,9 +12,13 @@ def get_all_states():
     """ Get list of all state
     """
 
-    print(State)
+    all_states = storage.all(State).values()
+    states_list = []
 
-    return jsonify({})
+    for state in all_states:
+        states_list.append(state.to_dict())
+
+    return jsonify(states_list)
 
 
 @app_views.route('/states/<state_id>', methods=['GET'], strict_slashes=False)
@@ -22,23 +26,25 @@ def get_a_state(state_id):
     """ Get a single state
     """
 
-    if storage.get(State, state_id) is None:
-        return make_response(jsonify({"error": "Not found"}), 404)
-    print(storage.get(State, state_id))
+    state = storage.get(State, state_id)
+    if state is None:
+        abort(404)
 
-    return jsonify({})
+    return jsonify(state.to_dict())
 
 
 @app_views.route('/states/<state_id>',
                  methods=['DELETE'], strict_slashes=False)
 def delete_a_state(state_id):
-    """ Delte a state
+    """ Delete a state
     """
 
-    if storage.get(State, state_id) is None:
-        return make_response(jsonify({"error": "Not found"}), 404)
+    state = storage.get(State, state_id) 
+    if state is None:
+        abort(404)
 
-    storage.delete(storage.get(State, state_id))
+    storage.delete(state)
+    storage.save()
 
     return make_response(jsonify({}), 200)
 
@@ -48,8 +54,18 @@ def create_a_state():
     """ Create a state
     """
 
-    State.save()
-    return make_response(jsonify({}), 201)
+    if not request.get_json():
+        abort(400, description="Not a JSON")
+
+    if 'name' not in request.get_json():
+        abort(400, description="Missing name")
+
+    data = request.get_json()
+
+    instance = State(**data)
+    instance.save()
+
+    return make_response(jsonify(instance.to_dict()), 201)
 
 
 @app_views.route('/states/<state_id>', methods=['PUT'], strict_slashes=False)
@@ -57,8 +73,20 @@ def modify_a_state(state_id):
     """ Modify a state
     """
 
-    if storage.get(State, state_id) is None:
-        return make_response(jsonify({"error": "Not found"}), 404)
+    state = storage.get(State, state_id) 
+    if state is None:
+        abort(404)
 
-    State.save()
-    return make_response(jsonify({}), 200)
+    if not request.get_json():
+        abort(400, description="Not a JSON")
+
+    skip = ['id', 'created_at', 'updated_at']
+
+    data = request.get_json()
+
+    for key, value in data.items():
+        if key not in skip:
+            setattr(state, key, value)
+    storage.save()
+
+    return make_response(jsonify(state.to_dict()), 200)
