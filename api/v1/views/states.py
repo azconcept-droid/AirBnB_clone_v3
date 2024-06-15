@@ -39,7 +39,7 @@ def delete_a_state(state_id):
     """ Delete a state
     """
 
-    state = storage.get(State, state_id) 
+    state = storage.get(State, state_id)
     if state is None:
         abort(404)
 
@@ -73,7 +73,7 @@ def modify_a_state(state_id):
     """ Modify a state
     """
 
-    state = storage.get(State, state_id) 
+    state = storage.get(State, state_id)
     if state is None:
         abort(404)
 
