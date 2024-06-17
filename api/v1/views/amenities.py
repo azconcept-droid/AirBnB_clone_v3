@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ Amenities view
 """
-from flask import jsonify, make_response, request
+from flask import jsonify, make_response, request, abort
 from models.state import State
 from models.city import City
 from models.amenity import Amenity
@@ -14,7 +14,13 @@ def get_all_amenities():
     """ Get list of all Amenity
     """
 
-    return jsonify({})
+    all_amenities = storage.all(Amenity).values()
+    amenity_list = []
+
+    for amenity in all_amenities:
+        amenity_list.append(amenity.to_dict())
+
+    return jsonify(amenity_list)
 
 
 @app_views.route('/amenities/<amenity_id>',
@@ -23,10 +29,12 @@ def get_an_amenity(amenity_id):
     """ Get an amenity
     """
 
-    if storage.get(Amenity, amenity_id) is None:
-        return make_response(jsonify({"error": "Not found"}), 404)
+    amenity = storage.get(Amenity, amenity_id)
 
-    return jsonify({})
+    if amenity is None:
+        abort(404)
+
+    return jsonify(amenity.to_dict())
 
 
 @app_views.route('/amenities/<amenity_id>',
@@ -35,10 +43,13 @@ def delete_an_amenity(amenity_id):
     """ Delte an amenity
     """
 
-    if storage.get(Amenity, amenity_id) is None:
-        return make_response(jsonify({"error": "Not found"}), 404)
+    amenity = storage.get(Amenity, amenity_id)
 
-    storage.delete(storage.get(Amenity, amenity_id))
+    if amenity is None:
+        abort(404)
+
+    storage.delete(amenity)
+    storage.save()
 
     return make_response(jsonify({}), 200)
 
@@ -48,8 +59,18 @@ def create_an_amenity():
     """ Create an amenity
     """
 
-    Amenity.save()
-    return make_response(jsonify({}), 201)
+    if not request.get_json():
+        abort(400, description="Not a JSON")
+
+    if 'name' not in request.get_json():
+        abort(400, description="Missing name")
+
+    data = request.get_json()
+
+    instance = Amenity(**data)
+    instance.save()
+
+    return make_response(jsonify(instance.to_dict()), 201)
 
 
 @app_views.route('/amenities/<amenity_id>',
@@ -58,8 +79,20 @@ def modify_an_amenity(amenity_id):
     """ Modify an amenity
     """
 
-    if storage.get(Amenity, amenity_id) is None:
-        return make_response(jsonify({"error": "Not found"}), 404)
+    amenity = storage.get(Amenity, amenity_id)
+    if amenity is None:
+        abort(404)
 
-    Amenity.save()
-    return make_response(jsonify({}), 200)
+    if not request.get_json():
+        abort(400, description="Not a JSON")
+
+    skip = ['id', 'created_at', 'updated_at']
+
+    data = request.get_json()
+
+    for key, value in data.items():
+        if key not in skip:
+            setattr(amenity, key, value)
+    storage.save()
+
+    return make_response(jsonify(amenity.to_dict()), 200)

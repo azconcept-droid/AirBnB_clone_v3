@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ Place and review view
 """
-from flask import jsonify, make_response, request
+from flask import jsonify, make_response, request, abort
 from models.user import User
 from models.place import Place
 from models.city import City
@@ -15,11 +15,16 @@ from api.v1.views import app_views
 def get_all_reviews(place_id):
     """ Get list of all reviews in a place
     """
+    place = storage.get(Place, place_id)
 
-    if storage.get(Place, place_id) is None:
-        return make_response(jsonify({"error": "Not found"}), 404)
+    if place is None:
+        abort(404)
 
-    return jsonify({})
+    review_list = []
+    for review in place.reviews:
+        review_list.append(review.to_dict())
+
+    return make_response(jsonify(review_list), 200)
 
 
 @app_views.route('/reviews/<review_id>', methods=['GET'], strict_slashes=False)
@@ -27,11 +32,11 @@ def get_a_review(review_id):
     """ Get a single review
     """
 
-    if storage.get(Review, review_id) is None:
-        return make_response(jsonify({"error": "Not found"}), 404)
-    print(storage.get(Review, review_id))
+    review = storage.get(Review, review_id)
+    if review is None:
+        abort(404)
 
-    return jsonify({})
+    return make_response(jsonify(review.to_dict()), 200)
 
 
 @app_views.route('/reviews/<review_id>',
@@ -40,10 +45,13 @@ def delete_a_review(review_id):
     """ Delete a review
     """
 
-    if storage.get(Review, review_id) is None:
-        return make_response(jsonify({"error": "Not found"}), 404)
+    review = storage.get(Review, review_id)
 
-    storage.delete(storage.get(Review, review_id))
+    if review is None:
+        abort(404)
+
+    storage.delete(review)
+    storage.save()
 
     return make_response(jsonify({}), 200)
 
@@ -53,15 +61,31 @@ def delete_a_review(review_id):
 def create_a_review(place_id):
     """ Create a review of a place
     """
+    place = storage.get(Place, place_id)
 
-    if storage.get(Place, place_id) is None:
-        return make_response(jsonify({"error": "Not found"}), 404)
+    if place is None:
+        abort(404)
 
-    # if storage.get(User, user_id) is None:
-    #     return make_response(jsonify({"error": "Not found"}), 404)
+    if not request.get_json():
+        return make_response(jsonify({"error": "Not a JSON"}), 400)
 
-    Place.save()
-    return make_response(jsonify({}), 201)
+    data = request.get_json()
+    if 'user_id' not in data:
+        return make_response(jsonify({"error": "Missing user_id"}), 400)
+
+    user = storage.get(User, data['user_id'])
+
+    if user is None:
+        abort(404)
+
+    if 'text' not in data:
+        return make_response(jsonify({"error": "Missing text"}), 400)
+
+    instance = Review(**data)
+    instance.place_id = place.id
+    instance.save()
+
+    return make_response(jsonify(instance.to_dict()), 201)
 
 
 @app_views.route('/reviews/<review_id>', methods=['PUT'], strict_slashes=False)
@@ -69,8 +93,20 @@ def update_a_review(review_id):
     """ Update a review in a place
     """
 
-    if storage.get(Review, review_id) is None:
-        return make_response(jsonify({"error": "Not found"}), 404)
+    review = storage.get(Review, review_id)
+    if review is None:
+        abort(404)
 
-    Review.save()
-    return make_response(jsonify({}), 200)
+    if not request.get_json():
+        return make_response(jsonify({"error": "Not a JSON"}), 400)
+
+    skip = ['id', 'user_id', 'place_id', 'created_at', 'updated_at']
+
+    data = request.get_json()
+
+    for key, value in data.items():
+        if key not in skip:
+            setattr(review, key, value)
+    storage.save()
+
+    return make_response(jsonify(review.to_dict()), 200)
